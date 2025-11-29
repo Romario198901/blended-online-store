@@ -1,0 +1,4 @@
+import"./assets/styles-CCJQcokt.js";import{a as o}from"./assets/vendor-BWC8OeqA.js";const r="https://dummyjson.com/",i={CATEGORIES:"/products/category-list",PRODUCTS:"/products"},n=12;o.defaults.baseURL=r;async function u(){const{data:t}=await o.get(i.CATEGORIES);return t}async function g(t=1){const s=(t-1)*n,{data:e}=await o.get(`${i.PRODUCTS}?limit=${n}&skip=${s}`);return e}const d={categoriesList:document.querySelector(".categories")};function l(t){const e=["All",...t].map(c=>`<li class="categories__item">
+   <button class="categories__btn" type="button">${c}</button>
+ </li>`).join("");d.categoriesList.innerHTML=e;const a=document.querySelector("categories__btn");a&&a.classList.add("ategories__btn--active")}async function m(){const t=await u();l(t),g()}document.addEventListener("DOMContentLoaded",m);
+//# sourceMappingURL=index.js.map
