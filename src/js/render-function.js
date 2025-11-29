@@ -1,4 +1,4 @@
-import { refs } from "./refs";
+import { refs } from './refs';
 
 export function renderCategoryList(categories) {
   const allCategories = ['All', ...categories];
@@ -9,10 +9,27 @@ export function renderCategoryList(categories) {
  </li>`
     )
     .join('');
-    refs.categoriesList.innerHTML = markup;
-    const firstCategoryBtn = document.querySelector('categories__btn');
-    if(firstCategoryBtn) {
-        firstCategoryBtn.classList.add('ategories__btn--active');
-    }
+  refs.categoriesList.innerHTML = markup;
+  const firstCategoryBtn = document.querySelector('.categories__btn');
+  firstCategoryBtn.classList.add('categories__btn--active');
 }
-
+export function renderProducts(products) {
+  const markup = products
+    .map(({id, images, title, brand, category, price}) => {
+      return `<li class="products__item" data-id="${id}">
+    <img class="products__image" src="${images[0]}" alt="${title}"/>
+    <p class="products__title">${title}</p>
+    <p class="products__brand"><span class="products__brand--bold">Brand: ${brand || "Unknown"}</span></p>
+    <p class="products__category">Category: ${category}</p>
+    <p class="products__price">Price: ${price}</p>
+ </li>`;
+    })
+    .join('');
+    refs.productsList.insertAdjacentHTML('beforeend', markup);
+}
+export function showLoadMoreButton() {
+    refs.loadMoreButton.classList.remove('is-hidden');
+}
+export function hideLoadMoreButton() {
+    refs.loadMoreButton.classList.add('is-hidden');
+}
