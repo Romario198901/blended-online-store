@@ -27,9 +27,24 @@ export function renderProducts(products) {
     .join('');
     refs.productsList.insertAdjacentHTML('beforeend', markup);
 }
+export function clearProducts () {
+  refs.productsList.innerHTML = '';
+}
 export function showLoadMoreButton() {
     refs.loadMoreButton.classList.remove('is-hidden');
 }
 export function hideLoadMoreButton() {
     refs.loadMoreButton.classList.add('is-hidden');
+}
+export function showBlockNotFound() {
+  refs.blockNotFound.classList.add('not-found--visible');
+}
+export function hideBlockNotFound() {
+  refs.blockNotFound.classList.remove('not-found--visible');
+}
+export function hideClearInputBtn () {
+  refs.clearInputBtn.classList.add('is-hidden');
+}
+export function showClearInputBtn () {
+  refs.clearInputBtn.classList.remove('is-hidden');
 }
