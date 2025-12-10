@@ -1,12 +1,19 @@
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 import { ITEMS_PER_PAGE } from './constants';
-import { getCategories, getProducts, getProductsbyCategory, getProductsbyQuery } from './products-api';
+import {
+  getCategories,
+  getProductById,
+  getProducts,
+  getProductsbyCategory,
+  getProductsbyQuery,
+} from './products-api';
 import {
   clearProducts,
   hideBlockNotFound,
   hideClearInputBtn,
   hideLoadMoreButton,
+  removeActiveClass,
   renderCategoryList,
   renderProducts,
   showBlockNotFound,
@@ -14,15 +21,18 @@ import {
   showLoadMoreButton,
 } from './render-function';
 import { refs } from './refs';
+import { createModal, showModal } from './modal';
 let currentPage = 1;
 let totalPages;
 let searchMode = false;
 let currentQuery = '';
+let currentCategory = '';
 export async function initHomepage() {
   const categories = await getCategories();
   renderCategoryList(categories);
   searchMode = false;
   currentQuery = '';
+  currentCategory = 'ALL';
   currentPage = 1;
   const { products, total } = await getProducts();
   totalPages = Math.ceil(total / ITEMS_PER_PAGE);
@@ -40,6 +50,11 @@ export async function loadMoreBtnClicked() {
   let total;
   if (searchMode && currentQuery) {
     ({ products, total } = await getProductsbyQuery(currentQuery, currentPage));
+  } else if (currentCategory && currentCategory !== 'ALL') {
+    ({ products, total } = await getProductsbyCategory(
+      currentCategory,
+      currentPage
+    ));
   } else {
     ({ products, total } = await getProducts(currentPage));
   }
@@ -85,6 +100,7 @@ export async function submitBtnClicked(e) {
   }
   clearProducts();
   currentPage = 1;
+  currentCategory = 'all';
   searchMode = true;
   currentQuery = query;
   const { products, total } = await getProductsbyQuery(query, currentPage);
@@ -105,15 +121,14 @@ export async function submitBtnClicked(e) {
     hideLoadMoreButton();
   }
 }
-
 export async function clearInputBtnClicked() {
   refs.searchForm.elements.searchValue.value = '';
   hideClearInputBtn();
   clearProducts();
   hideBlockNotFound();
   searchMode = false;
-    currentQuery = '';
-    currentPage = 1;
+  currentQuery = '';
+  currentPage = 1;
   try {
     const { products, total } = await getProducts();
     totalPages = Math.ceil(total / ITEMS_PER_PAGE);
@@ -130,10 +145,56 @@ export async function clearInputBtnClicked() {
   }
 }
 export async function filterProductsByCategory(e) {
-  if(e.target.nodeName !== 'BUTTON') {
+  if (e.target.nodeName !== 'BUTTON') {
     return;
   }
-const category = e.target.textContent;
-currentPage = 1;
-
+  removeActiveClass();
+  const category = e.target.textContent.toLowerCase();
+  currentCategory = category;
+  currentPage = 1;
+  searchMode = false;
+  currentQuery = '';
+  if (category === 'all') {
+    e.target.classList.add('categories__btn--active');
+    clearProducts();
+    hideLoadMoreButton();
+    await initHomepage();
+    showLoadMoreButton();
+  } else {
+    e.target.classList.add('categories__btn--active');
+    clearProducts();
+    hideLoadMoreButton();
+    try {
+      const { total, products } = await getProductsbyCategory(
+        currentCategory,
+        currentPage
+      );
+      if (!products || products.length === 0) {
+        showBlockNotFound();
+      } else {
+        hideBlockNotFound();
+      }
+      totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+      renderProducts(products);
+      currentPage += 1;
+      if (currentPage <= totalPages) {
+        showLoadMoreButton();
+      } else {
+        hideLoadMoreButton();
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+}
+export async function ProductCardClicked(e) {
+  if (e.target.nodeName !== 'LI') {
+    return;
+  }
+  const id = e.target.dataset.id;
+  const product = await getProductById(id);
+  createModal(product);
+  showModal();
 }

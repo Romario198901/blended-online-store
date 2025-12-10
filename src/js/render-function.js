@@ -48,3 +48,13 @@ export function hideClearInputBtn () {
 export function showClearInputBtn () {
   refs.clearInputBtn.classList.remove('is-hidden');
 }
+export function removeActiveClass() {
+    const activeButtons = document.querySelectorAll('.categories__btn--active');
+    activeButtons.forEach(btn => {
+        btn.classList.remove('categories__btn--active');
+    });
+}
+
+
+
+
